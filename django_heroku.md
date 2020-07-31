@@ -31,6 +31,8 @@ All commands in the `Procfile` are executed by the app on startup. The `Procfile
     $ touch Procfile
 
     $ echo 'web: gunicorn <PROJECT_NAME>.wsgi' >> Procfile
+    
+This command will start your project on the Gunicorn server on Heroku.
 
 <!-- ## django-heroku
 
