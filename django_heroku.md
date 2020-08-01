@@ -106,6 +106,8 @@ Generate a 50-character `SECRET_KEY_PRODUCTION` which will be used in production
 Add this key to the `.env` file as a keyword pair.
 
     $ echo "DJANGO_SECRET_KEY_PRODUCTION='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'" >> .env
+    
+where `'xxxxx...'`is your unique 50-character key wrapped in quotes. 
 
 Let's also add Django's `DEBUG` variable to `.env`. 
 
