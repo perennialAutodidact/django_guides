@@ -1,12 +1,12 @@
 # Deploy Django Project to Heroku
 
-A step-by-step guide for deploying a Django project to Heroku.
+A step-by-step guide for deploying a [Django](https://www.djangoproject.com/) project to [Heroku](https://www.heroku.com/) using the Git command line.
 
-This guide is written using a Linux terminal. 
+This guide is written using a Linux terminal and will use Django 3.0 and Python 3.8.
 
 ## Create Django Project
 
-This guide will be using a `pipenv` environment to manage dependencies.
+This guide will be using a [Pipenv](https://github.com/pypa/pipenv) environment to manage dependencies.
 
 Create a `pipenv` environment in the root directory for your repository.
 
@@ -22,9 +22,43 @@ Create a Django project inside the Pipenv environment.
     
 where `<PROJECT_NAME>` is the name of your project.
 
+## Git
+
+We will be using the Git command line to push our code to the Heroku server. Make sure you have [Git](https://git-scm.com/) installed.
+
+To initialize your project as a Git repository, navigate to the top level of your repository and run:
+
+    <PROJECT_NAME> $ git init 
+    
+Changes to files will need to be committed to this repository in order for them to be pushed to Heroku to be run. 
+
+To see changes that have been made and other untracked files, run:
+
+    <PROJECT_NAME> $ git init 
+
+You can add files individually entering their file paths separated by spaces or by using the `-A` flag
+
+    <PROJECT_NAME> $ git add file_name1 file_name2 directory_1
+
+or
+
+    <PROJECT_NAME> $ git add -A
+    
+Then commit the changes by running `git commit` with the `-m` flag with a message describing the changes
+
+    <PROJECT_NAME> $ git commit -m 'Created <PROJECT_NAME> Django Project'
+
+## Gunicorn
+
+[Gunicorn](https://gunicorn.org/) is a server for Python Web Server Gateway Interface (WSGI) applications (like your Django app). It is a way to make sure that web servers and python web applications can talk to each other. Gunicorn takes care of everything which happens in-between the web server and your web application.
+
+Install the `gunicorn` package
+
+    $ pipenv install gunicorn
+
 ## Create Procfile
 
-The `Procfile` is used to explicitly declare your application’s process types and entry points. It is located in the root of your repository.
+The `Procfile` is used to explicitly declare your application’s process types and entry points. 
 
 All commands in the `Procfile` are executed by the app on startup. The `Procfile` should be created without a file extension and placed in the root directory of your repository.
 
@@ -36,31 +70,11 @@ Add the command `web: gunicorn <PROJECT_NAME>.wsgi` to your `Procfile`:
     
 This will start your project on the Gunicorn server on Heroku.    
 
-<!-- ## django-heroku
-
-The `django-heroku` package automatically configures your Django application to work on Heroku.
-
-`django-heroku` is compatible with Django 2.0 applications. Only Python 3.0 is supported.
-
-Install the `django-heroku` package
-
-    $ pipenv install django-heroku
-
-In `settings.py`:
-
-At the top:
-
-    import django_heroku
-
-At the very bottom:
-
-    django_heroku.settings(locals())
-
-This will automatically configure `DATABASE_URL`, `ALLOWED_HOSTS`, WhiteNoise (for static assets), Logging, and Heroku CI for your application. -->
+More info on the `Procfile` [here](https://devcenter.heroku.com/articles/procfile)
 
 ## Environment Variables
 
-Environment variables will be handled using `python-decouple`, which allows easy access to environment variables using a `.env` file.
+Environment variables will be handled using [Python Decouple](https://github.com/henriquebastos/python-decouple), which allows easy access to environment variables using a `.env` file.
 
 Install `python-decouple`
 
@@ -124,7 +138,7 @@ These **Config Vars** can also be set at `https://dashboard.heroku.com/apps/<YOU
 
 ## Static Files
 
-Django does not support serving static files in production. However, the fantastic WhiteNoise project can integrate into your Django application, and was designed with exactly this purpose in mind.
+Django does not support serving static files in production. However, the fantastic [WhiteNoise](http://whitenoise.evans.io/en/stable/) project can integrate into your Django application, and was designed with exactly this purpose in mind.
 
     $ pipenv install whitenoise
 
@@ -175,6 +189,28 @@ This will parse the values of the `DATABASE_URL` environment variable and conver
 
 Now that PostgreSQL has been set up in Django, let's try pushing our code to Heroku.
 
+## django-heroku
+
+The [Django-Heroku](https://github.com/heroku/django-heroku) package will help us automatically set up our `DATABASE_URL`, `ALLOWED_HOSTS`, WhiteNoise (for static assets), Logging, and Heroku Continuous Integration (CI) for your application.
+
+as specified in the [Django Deployment Checklist](https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/).
+
+`django-heroku` is compatible with Django 2.0 applications as well as Django 3.0 applications. Only Python 3 is supported.
+
+Install the `django-heroku` package
+
+    $ pipenv install django-heroku
+
+In `settings.py`:
+
+At the top:
+
+    import django_heroku
+
+At the very bottom:
+
+    django_heroku.settings(locals())
+
 ## Heroku
 
 Create a new Heroku app.
@@ -195,7 +231,7 @@ If no PostgreSQL database was created, the following command can be used:
 
     heroku addons:create heroku-postgresql:<PLAN_NAME>
 
-where `<PLAN_NAME>` is the name of the Heroku service tier you want for your database. 
+where `<PLAN_NAME>` is the name of the [Heroku PostreSQL Plan](https://devcenter.heroku.com/articles/heroku-postgres-plans) you want for your database. 
 
 For now we'll set up the database with Heroku's free plan with the name of `hobby-dev`, which allows 10,000 database rows for free. 
 
@@ -207,25 +243,13 @@ You can view more info about the current database by running:
 
     $ heroku pg
 
-### django-heroku
+As long as a `Pipfile`, `Pipfile.lock` or `requirements.txt` file are included in your project, Heroku shouldn't have trouble installing the dependencies on your server. Using Pipenv will generate both a `Pipfile` and `Pipfile.lock`, so you should be okay.
 
-The `django-heroku` package will help us automatically set up our database credentials, `staticfiles`, `allowed_hosts` and `logging` 
-as specified in the [Django Deployment Checklist](https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/).
+If you want to generate a `requirements.txt` file you can run
 
-Install `django-heroku`:
-
-    $ pipenv install django-heroku
-
-In `settings.py`:
-
-    import django_heroku
-
-    ...
-
-    # at the very bottom
-    django_heroku.settings(locals())
-
-This will automatically configure database credentials and other niceties.
+    $ pipenv run pip freeze > requirements.txt
+    
+Add and commit all local changes in your repository.
 
 Push the changes to Heroku
 
