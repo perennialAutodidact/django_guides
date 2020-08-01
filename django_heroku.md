@@ -34,7 +34,7 @@ Changes to files will need to be committed to this repository in order for them 
 
 To see changes that have been made and other untracked files, run:
 
-    <PROJECT_NAME> $ git init 
+    <PROJECT_NAME> $ git status 
 
 You can add files individually entering their file paths separated by spaces or by using the `-A` flag
 
