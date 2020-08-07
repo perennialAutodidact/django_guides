@@ -1,4 +1,4 @@
-# Custom User model inheriting from AbstractUser
+# Custom User Model
 
 This guide will walk through the steps necessary to create a custom user model in Django by extending Django's `django.contrib.auth.models.AbstractUser` class.
 
