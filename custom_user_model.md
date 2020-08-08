@@ -143,3 +143,36 @@ Apply changes to the database.
 ## That's it!
 
 Now we're ready to start adding fields to our `CustomUser` model. 
+
+We'll add a `phone_number` field for example.
+
+In `users/models.py`:
+
+    from django.db import models
+    from django.contrib.auth.models import AbstractUser
+
+    class CustomUser(AbstractUser):
+        phone_number = models.CharField(max_length=20)
+    
+    def __str__(self):
+        return self.username
+
+This is also where we can relate the `CustomUser` model to other models.
+
+Let's say we've created another model in a `profile_images` app called `ProfileImage`. We'll relate to the user's `profile_image` with a `ForeignKey`.
+
+    from django.db import models
+    from django.contrib.auth.models import AbstractUser
+    
+    # import related model
+    from profile_images import ProfileImage
+
+
+    class CustomUser(AbstractUser):
+        phone_number = models.CharField(max_length=20)
+    
+        profile_image = models.ForeignKey(ProfileImage, on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.username
+
