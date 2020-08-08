@@ -60,11 +60,7 @@ Create `users` app
 
     $ python manage.py startapp users
 
-Create `profile_images` app
-
-    $ python manage.py startapp profile_images
-
-In your project's `settings.py`, add `users` and `profile_images` to the list of installed apps.
+In your project's `settings.py`, add `users` to the list of installed apps.
 
     INSTALLED_APPS = [
         'django.contrib.admin',
@@ -73,7 +69,6 @@ In your project's `settings.py`, add `users` and `profile_images` to the list of
         ...
         ...
         'users',           # add this
-        'profile_images',  # add this
     ]
 
 ## Custom User Model
