@@ -1,4 +1,4 @@
-# simplified_guides
+# Django Guides
 
 A collection of easy-to-follow (hopefully) guides for accomplishing a variety of tasks in Django.
 
