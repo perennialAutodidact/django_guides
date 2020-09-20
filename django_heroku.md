@@ -90,19 +90,20 @@ In the root directory of your repository, create a file called `.env` which will
 
 Generate a 50-character `SECRET_KEY_PRODUCTION` which will be used in production.
 
-    import random
-    from string import (
+```python
+import secrets
+from string import (
     ascii_letters as letters,
     digits,
     punctuation
-    )
+)
 
-    chars = letters + digits + punctuation
+chars = letters + digits + punctuation
 
-    secret_key = ''.join([random.choice(chars) for i in range(50)])
+secret_key = ''.join([secrets.choice(chars) for i in range(50)])
 
-    print(secret_key)
-
+print(secret_key)
+```
 Add this key to the `.env` file as a keyword pair.
 
     $ echo "DJANGO_SECRET_KEY_PRODUCTION='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'" >> .env
@@ -115,18 +116,20 @@ Let's also add Django's `DEBUG` variable to `.env`.
 
 In `settings.py`, replace the current definition of the `SECRET_KEY` and `DEBUG` with:
 
-    # cast=bool will convert the string 'True' in .env into a boolean True
-    DEBUG = decouple.config('DJANGO_DEBUG', cast=bool)
+```python
+# cast=bool will convert the string 'True' in .env into a boolean True
+DEBUG = decouple.config('DJANGO_DEBUG', cast=bool)
 
-    # Secret Key - Development vs Production
-    if DEBUG:
-        # SECURITY WARNING: keep the secret key used in production secret!
-        key = 'DJANGO_SECRET_KEY_DEV'
-    else:
-        key = 'DJANGO_SECRET_KEY_PRODUCTION'
-    
-    # get the secret key
-    SECRET_KEY = decouple.config(key)
+# Secret Key - Development vs Production
+if DEBUG:
+    # SECURITY WARNING: keep the secret key used in production secret!
+    key = 'DJANGO_SECRET_KEY_DEV'
+else:
+    key = 'DJANGO_SECRET_KEY_PRODUCTION'
+
+# get the secret key
+SECRET_KEY = decouple.config(key)
+```
 
 If any other environment variables are used in your project, references to them will need to be changed to use `decouple.config()`.
 
@@ -146,12 +149,14 @@ Django does not support serving static files in production. However, the fantast
 
 In `settings.py`:
 
-    MIDDLEWARE = [
-    # Simplified static file serving.
-    # https://warehouse.python.org/project/whitenoise/
-    # PLACE AT THE TOP
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    ...
+```python
+MIDDLEWARE = [
+# Simplified static file serving.
+# https://warehouse.python.org/project/whitenoise/
+# PLACE AT THE TOP
+'whitenoise.middleware.WhiteNoiseMiddleware',
+...
+```
 
 Your application will now serve static assets directly from Gunicorn in production. This will be perfectly adequate for most applications, but top-tier applications may want to explore using a CDN with Django-Storages.
 
@@ -167,11 +172,13 @@ To use PostgreSQL as your database in Python applications you will need to use t
 
 In `settings.py`:
 
-    import psycopg2
+```python
+import psycopg2
 
-    DATABASE_URL = decouple.config('DATABASE_URL')
+DATABASE_URL = decouple.config('DATABASE_URL')
 
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+```
 
 If you leave off `sslmode=require` you may get a connection error when attempting to connect to production-tier databases.
 
@@ -181,11 +188,13 @@ Install `dj-database-url`
 
 In `settings.py`:
 
-    import dj_database_url
+```python
+import dj_database_url
 
-    ...
+...
 
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+```
 
 This will parse the values of the `DATABASE_URL` environment variable and convert them to something Django can understand.
 
@@ -207,11 +216,15 @@ In `settings.py`:
 
 At the top:
 
-    import django_heroku
+```python
+import django_heroku
+```
 
 At the very bottom:
 
-    django_heroku.settings(locals())
+```python
+django_heroku.settings(locals())
+```
 
 ## Heroku
 
