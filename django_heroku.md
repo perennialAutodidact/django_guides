@@ -151,11 +151,12 @@ In `settings.py`:
 
 ```python
 MIDDLEWARE = [
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-# PLACE AT THE TOP
-'whitenoise.middleware.WhiteNoiseMiddleware',
-...
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+    # PLACE AT THE TOP
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    ...
+]
 ```
 
 Your application will now serve static assets directly from Gunicorn in production. This will be perfectly adequate for most applications, but top-tier applications may want to explore using a CDN with Django-Storages.
