@@ -62,14 +62,16 @@ Create `users` app
 
 In your project's `settings.py`, add `users` to the list of installed apps.
 
-    INSTALLED_APPS = [
-        'django.contrib.admin',
-        'django.contrib.auth',
-        ...
-        ...
-        ...
-        'users',           # add this
-    ]
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    ...
+    ...
+    ...
+    'users',           # add this
+]
+```
 
 ## Custom User Model
 
@@ -79,15 +81,17 @@ We could call our extended model `User`, but to avoid confusing with Django's de
 
 In `users/models.py`:
 
-    from django.contrib.auth.models import AbstractUser
+```python
+from django.contrib.auth.models import AbstractUser
 
-    class CustomUser(AbstractUser):
-        # we're not adding any new fields yet so we'll just
-        pass
-    
-    def __str__(self):
-        return self.username
-        
+class CustomUser(AbstractUser):
+    # we're not adding any new fields yet so we'll just
+    pass
+
+def __str__(self):
+    return self.username
+```
+
 That's really all it takes. Now our `CustomUser` model is ready to accept new fields.
 
 We do have a few more things to configure to get our `CustomUser` model ready for use.
@@ -100,12 +104,14 @@ Notice that we first refer to the name of the app in which our `CustomUser` mode
 
 We need to register our new `CustomUser` model in `users/admin.py`:
 
-    from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin # add
-    from .models import CustomUser                  # add
+```python
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin # add
+from .models import CustomUser                  # add
 
-    # Register our user model and the UserAdmin
-    admin.site.register(CustomUser, UserAdmin)      # add
+# Register our user model and the UserAdmin
+admin.site.register(CustomUser, UserAdmin)      # add
+```
 
 ## Migrate
 
@@ -148,31 +154,34 @@ We'll add a `phone_number` field for example.
 
 In `users/models.py`:
 
-    from django.db import models
-    from django.contrib.auth.models import AbstractUser
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractUser
 
-    class CustomUser(AbstractUser):
-        phone_number = models.CharField(max_length=20)
-    
-    def __str__(self):
-        return self.username
+class CustomUser(AbstractUser):
+    phone_number = models.CharField(max_length=20)
+
+def __str__(self):
+    return self.username
+```
 
 This is also where we can relate the `CustomUser` model to other models.
 
 Let's say we've created another model in a `profile_images` app called `ProfileImage`. We'll relate to the user's `profile_image` with a `ForeignKey`.
 
-    from django.db import models
-    from django.contrib.auth.models import AbstractUser
-    
-    # import related model
-    from profile_images import ProfileImage
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+# import related model
+from profile_images import ProfileImage
 
 
-    class CustomUser(AbstractUser):
-        phone_number = models.CharField(max_length=20)
-    
-        profile_image = models.ForeignKey(ProfileImage, on_delete=models.PROTECT)
-    
-    def __str__(self):
-        return self.username
+class CustomUser(AbstractUser):
+    phone_number = models.CharField(max_length=20)
 
+    profile_image = models.ForeignKey(ProfileImage, on_delete=models.PROTECT)
+
+def __str__(self):
+    return self.username
+```
