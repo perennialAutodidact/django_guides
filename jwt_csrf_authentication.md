@@ -3,7 +3,7 @@
  JSON Web Token & CSRF Token Authentication between a Django REST Framework API and React
 
 <!-- TOC -->
-
+# Table of Contents
 - [Introduction](#introduction)
   - [Setup](#setup)
   - [Overview](#overview)
