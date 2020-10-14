@@ -1,15 +1,6 @@
-# Introduction
+# Backend
 
- JSON Web Token & CSRF Token Authentication between a Django REST Framework API and React
-
-<!-- TOC -->
-# Table of Contents
-- [Introduction](#introduction)
-  - [Setup](#setup)
-  - [Overview](#overview)
-  - [Environment Variables](#environment-variables)
-    - [env](#env)
-  - [Backend](#backend)
+- [Backend](#backend)
     - [Backend Dependencies](#backend-dependencies)
   - [Create Django Project](#create-django-project)
     - [main/settings.py](#mainsettingspy)
@@ -32,88 +23,8 @@
       - [User Detail](#user-detail)
       - [Logout](#logout)
   - [Conclusion](#conclusion)
-    - [Final file structure](#final-file-structure)
-
-<!-- /TOC -->
-
-## Setup
-
-[Top &#8593;](#table-of-contents)
-
-This project will be using **Django 3.1**, **Django REST Framework 3.1.1** and React via **create-react-app 3.4**.
-
-Create a folder `jwt_drf_react` for the project. Inside create a folder for `backend` and `frontend`.
-
-```bash
-~/ $ mkdir jwt_def_react && cd mkdir jwt_def_react
-jwt_def_react/ $ mkdir backend frontend
-```
-
-## Overview
-
-[Top &#8593;](#table-of-contents)
-
-Authentication will require three items:
-
-1. Django's Cross-Site Request Forgery (CSRF) Cookie
-
-    - Standard Django CSRF cookie
-    - Sent with each request
-
-2. JSON Web Token (JWT) Access Token
-
-    - Short exipiration
-    - Stored in app's state
-    - Used to access protected routes
-
-3. JWT Refresh Token
-
-    - Longer expiration
-    - Used to request access tokens
-    - Stored in an HTTPOnly cookie
-    - Associated with foreign key to a user in the database
-    - Deleted from database on logout or exipration
-
-When a user registers or logs in, they will be assigned a refresh token and and access token. When request is made for protected data, the access token will be passed to the server via the `Authorization` HTTP Header.
-
-If the access token is expired when sent, the refresh token is checked for validity. If the refresh token hasn't expired, a new access token is returned and the original request is repeated.
-
-If the token isn't expired and the user with the id of the token's `user_id` is the is authorized to access the data, the data is returned.
-
-The CSRF cookie will also be attached to each request and its existence and validity will be checked.
-
-## Environment Variables
-
-[Top &#8593;](#table-of-contents)
-
-Create a file called `.env` in the `jwt_drf_react` project folder. This file will be used to define environment variables. You will want to add this file the your `.gitignore` file to keep your secrets secret.
-
-### env
-
-```python
-DJANGO_DEBUG = 'True'
-
-# Django secret keys
-DJANGO_SECRET_KEY_DEVELOPMENT='xxxxxxxxxx'
-DJANGO_SECRET_KEY_PRODUCTION='xxxxxxxxxx'
-
-# Key for encoding user refresh tokens
-DJANGO_REFRESH_TOKEN_SECRET='xxxxxxxxxx'
-```
-
-Current file structure:
-
-```bash
-jwt_def_react/
-│   .env
-│   .gitignore
-├───backend
-└───frontend
-```
-
-## Backend
-
-[Top &#8593;](#table-of-contents)
+    - [Final backend structure](#final-backend-structure)
+      [Top &#8593;](#backend)
 
 Initialize Pipenv and install Django and other required packages.
 
@@ -126,7 +37,7 @@ $ pipenv install django==3.1.1 djangorestframework==3.11.1 django-cors-headers==
 
 ### Backend Dependencies
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 - Django - Python framework for building web apps
 - Django REST Framework - A powerful and flexible toolkit for building Web APIs.
@@ -136,7 +47,7 @@ $ pipenv install django==3.1.1 djangorestframework==3.11.1 django-cors-headers==
 
 ## Create Django Project
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 Create the Django project called `main`
 
@@ -170,7 +81,7 @@ jwt_drf_react/
 
 ### main/settings.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 With the exception of the `DEBUG` and `SECRET_KEY` settings, all of the following code is meant to be added to the existing Django settings. This is **not** a complete `settings.py` file on its own.
 
@@ -218,7 +129,8 @@ REFRESH_TOKEN_SECRET = decouple.config('DJANGO_REFRESH_TOKEN_SECRET')
 # Use custom user model for authentication
 AUTH_USER_MODEL = 'users.User'
 
-CORS_ALLOW_CREDENTIALS = True  # to accept cookies via axios
+# to accept cookies via axios
+CORS_ALLOW_CREDENTIALS = True
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
@@ -238,26 +150,27 @@ CSRF_TRUSTED_ORIGINS = [
     # other allowed origins...
 ]
 
-CORS_ALLOW_HEADERS = [
-    'authorization',
-    'content-type',
-    'refresh_token'
-    'x-csrftoken',
-    # 'x-xsrf-token' # might not be needed
-]
-
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     # other allowed hosts...
 ]
+
+CORS_ALLOW_HEADERS = [
+    'authorization',
+    'content-type',
+    'refresh_token'
+    'x-csrftoken',
+    'withcredentials
+]
+
 ```
 
 ---
 
 ### main/urls.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 We need to include the urls for the user app in our main urls. You can create any path you'd like for these urls, just make sure they're consistent when making calls to your API endpoints.
 
@@ -279,7 +192,7 @@ urlpatterns = [
 
 ## Users App
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 Create a Django app called `users`.
 
@@ -289,7 +202,7 @@ backend/ $ python manage.py startapp users
 
 ### Custom User Model
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 We'll be using a custom user model by extending the `AbstractUser` class. This might not be strictly necessary, but it will be required if you want any additional fields to the User model.
 
@@ -345,7 +258,7 @@ Running migrations:
   Applying auth.0006_require_contenttypes_0002... OK
   Applying auth.0007_alter_validators_add_error_messages... OK
   Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... 
+  Applying auth.0009_alter_user_last_name_max_length...
 OK
   Applying auth.0010_alter_group_name_max_length... OK
   Applying auth.0011_update_proxy_permissions... OK
@@ -359,7 +272,8 @@ OK
 ```
 
 #### users/admin.py
-[Top &#8593;](#table-of-contents)
+
+[Top &#8593;](#backend)
 
 ```python
 from django.contrib import admin
@@ -371,7 +285,8 @@ admin.site.register([User, RefreshToken])
 ```
 
 #### Create Superuser
-[Top &#8593;](#table-of-contents)
+
+[Top &#8593;](#backend)
 
 ```bash
 backend/ $ python manage.py createsuperuser
@@ -383,7 +298,7 @@ Login to the admin panel to ensure your models are showing up.
 
 ### users/serializers.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 Create a file called `serializers.py` which will contain the Django REST serializers for our custom User model. We'll have to overwrite the `create()` and `update()` methods for the `UserCreateSerializer` class in order to encrypt the user's password string.
 
@@ -437,7 +352,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 ### users/utils.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 We're going to need a few helper functions for generating JWT access and refresh tokens. These will be defined in `users/utils.py`
 
@@ -451,14 +366,13 @@ from django.conf import settings
 
 from users.models import User, RefreshToken
 
-def generate_access_token(user):
-    '''Generate JWT access token for the user'''
 
+def generate_access_token(user):
     access_token_payload = {
         # id from User instance
         'user_id': user.id,
-         # expiration date
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=5),
+        # expiration date
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, minutes=0, seconds=5),
         # initiated at date
         'iat': datetime.datetime.utcnow(),
         # additional items if desired
@@ -469,7 +383,7 @@ def generate_access_token(user):
         access_token_payload,
         settings.SECRET_KEY,
         algorithm='HS256'
-    )
+    ).decode(encoding='utf-8')
 
     return access_token
 
@@ -479,7 +393,7 @@ def generate_refresh_token(user):
     refresh_token_payload = {
         # id from User instance
         'user_id': user.id,
-         # expiration date
+        # expiration date
         'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7),
         # initiated at date
         'iat': datetime.datetime.utcnow(),
@@ -506,7 +420,7 @@ def generate_refresh_token(user):
 
 ### users/authentication.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 Now it's time to implement our custom authentication class. This will check the HTTP request for a CSRF Cookie and `Authorization` HTTP Header. Execptions will be raised if the CSRF Cookie is missing or invalid or if the the `Authorization` header is missing or the access token is expired.
 
@@ -588,7 +502,7 @@ class SafeJWTAuthentication(BaseAuthentication):
 
 ### users/urls.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 Let's create our URLs for our API endpoints. The 'users' prefix was added in `main/urls.py` so our paths in `users/urls.py` will contain everything after `users/`.
 
@@ -626,9 +540,9 @@ urlpatterns = [
 
 ### users/views.py
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
-Now we're ready to create our API views. We will use function-based views with Django REST Framework decorators to define our allowed API methods, permission and authentication classes for each endpoint. Since we're not using class-based views, this file is kind of a doozie!
+Now we're ready to create our API views. We will use function-based views with Django REST Framework decorators to define our allowed API methods and permission and authentication classes for each endpoint. Since we're not using class-based views, this file is kind of a doozie!
 
 We'll break this file down into sections, by view function.
 
@@ -658,7 +572,7 @@ from .utils import generate_access_token, generate_refresh_token
 
 #### Register
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 ```python
 @api_view(['POST'])
@@ -674,7 +588,7 @@ def register(request):
 
     if request.data.get('password') != request.data.get('password2'):
         # if password and password2 don't match return status 400
-        response.data = {'msg': "Passwords don't match"}
+        response.data = {'msg': ["Passwords don't match"]}
         response.status_code = status.HTTP_400_BAD_REQUEST
         return response
 
@@ -688,7 +602,9 @@ def register(request):
 
         # attach the access token to the response data
         # and set the response status code to 201
-        response.data = {'accessToken': access_token}
+        new_username = new_user.username
+        response.data = {'accessToken': access_token,
+                         'msg': [f'Welcome, {new_username}!']}
         response.status_code = status.HTTP_201_CREATED
 
         # create refreshtoken cookie
@@ -704,13 +620,11 @@ def register(request):
         # return successful response
         return response
 
-    # if serializer is invalid
-    response.data = {'msg': 'Incorrect username or password'}
-    response.status_code = status.HTTP_400_BAD_REQUEST
     # if the serialized data is NOT valid
     # send a response with error messages and status code 400
     response.data = {
-        'error': [msg for msg in new_user_serializer.errors.values()]}
+        'msg': [msg for msg in new_user_serializer.errors.values()]}
+
     response.status_code = status.HTTP_400_BAD_REQUEST
     # return failed response
     return response
@@ -718,7 +632,7 @@ def register(request):
 
 #### Login
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 ```python
 @api_view(['POST'])
@@ -734,7 +648,7 @@ def login(request):
     password = request.data.get('password')
 
     if username is None or password is None:
-        response.data = {'msg': 'Username and password required.'}
+        response.data = {'msg': ['Username and password required.']}
         response.status_code = status.HTTP_400_BAD_REQUEST
         return response
 
@@ -742,7 +656,7 @@ def login(request):
 
     if user is None or not user.check_password(password):
         response.data = {
-            'msg': 'Incorrect username or password'
+            'msg': ['Incorrect username or password']
         }
         response.status_code = status.HTTP_400_BAD_REQUEST
         return response
@@ -761,6 +675,7 @@ def login(request):
         RefreshToken.objects.create(user=user, token=refresh_token)
 
     except RefreshToken.DoesNotExist:
+
         # assign a new refresh token to the current user
         RefreshToken.objects.create(user=user, token=refresh_token)
 
@@ -769,14 +684,15 @@ def login(request):
         key='refreshtoken',  # cookie name
         value=refresh_token,  # cookie value
         httponly=True,  # to help prevent XSS
-        samesite='strict',  # to help prevent XSS
         domain='localhost',  # change in production
+        samesite='strict',  # to help prevent XSS
         # secure=True # for https connections only
     )
 
     # return the access token in the reponse
     response.data = {
-        'accessToken': access_token
+        'accessToken': access_token,
+        'msg': ['Login successful!']
     }
     response.status_code = status.HTTP_200_OK
     return response
@@ -784,19 +700,29 @@ def login(request):
 
 #### Auth
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 ```python
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([SafeJWTAuthentication])
+@ensure_csrf_cookie
 def auth(request):
     '''Return the user data for the user id contained in a valid access token'''
     # create response object
     response = Response()
 
     # Get the access token from headers
-    access_token = request.headers.get('Authorization').split(' ')[1]
+    access_token = request.headers.get('Authorization')
+
+    # if the access token doesn't exist, return 401
+    if access_token is None:
+        response.data = {'msg': ['No access token']}
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
+
+    # remove 'token' prefix
+    access_token = access_token.split(' ')[1]
 
     # decode access token payload
     payload = jwt.decode(
@@ -809,29 +735,29 @@ def auth(request):
     user = User.objects.filter(id=payload.get('user_id')).first()
 
     if user is None:
-        response.data = {'msg': 'User not found'}
+        response.data = {'msg': ['User not found']}
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
 
     if not user.is_active:
-        response.data = {'msg': 'User not active'}
+        response.data = {'msg': ['User not active']}
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
 
     # serialize the User object and attach to response data
     serialized_user = UserDetailSerializer(instance=user)
     response.data = {'user': serialized_user.data}
-
     return response
 ```
 
 #### Extend Token
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 ```python
 @api_view(['GET'])
-@permission_classes([])
+@permission_classes([AllowAny])
+@ensure_csrf_cookie
 def extend_token(request):
     '''Return new access token if request's refresh token cookie is valid'''
     # create response object
@@ -844,7 +770,20 @@ def extend_token(request):
     # return 401 - Unauthorized
     if refresh_token is None:
         response.data = {
-            'msg': 'Authentication credentials were not provided'
+            'msg': ['Authentication credentials were not provided']
+        }
+
+        response.status_code = status.HTTP_401_UNAUTHORIZED
+        return response
+
+    # if the refresh_token doesn't exist in the database,
+    # return 401 - Unauthorized
+    user_refresh_token = RefreshToken.objects.filter(
+        token=refresh_token).first()
+
+    if user_refresh_token is None:
+        response.data = {
+            'msg': ['Authentication credentials were not provided']
         }
 
         response.status_code = status.HTTP_401_UNAUTHORIZED
@@ -870,7 +809,7 @@ def extend_token(request):
         expired_token.delete()
 
         response.data = {
-            'error': 'Expired refresh token, please log in again.'
+            'msg': ['Expired refresh token, please log in again.']
         }
         response.status_code = status.HTTP_401_UNAUTHORIZED
 
@@ -883,14 +822,14 @@ def extend_token(request):
     user = User.objects.filter(id=payload.get('user_id')).first()
     if user is None:
         response.data = {
-            'msg': 'User not found'
+            'msg': ['User not found']
         }
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
 
     if not user.is_active:
         response.data = {
-            'msg': 'User is inactive'
+            'msg': ['User is inactive']
         }
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
@@ -933,10 +872,10 @@ Methods:
 - GET - Get the user object associated with the access token
 - PUT - Update the user info for the user associateed with the access token
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 ```python
-@api_view(['GET','PUT'])
+@api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
 @authentication_classes([SafeJWTAuthentication])
 @ensure_csrf_cookie
@@ -954,7 +893,7 @@ def user_detail(request, pk):
 
     if user is None:
         response.data = {
-            'msg': 'User not found'
+            'msg': ['User not found']
         }
         response.status_code = status.HTTP_401_UNAUTHORIZED
 
@@ -962,7 +901,7 @@ def user_detail(request, pk):
 
     if not user.is_active:
         response.data = {
-            'msg': 'User is inactive'
+            'msg': ['User is inactive']
         }
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
@@ -981,7 +920,7 @@ def user_detail(request, pk):
     # pk is not the owner of the token
     if pk != payload.get('user_id'):
         response.data = {
-            'msg':'Not authorized'
+            'msg': ['Not authorized']
         }
         response.status_code = status.HTTP_401_UNAUTHORIZED
         return response
@@ -1003,45 +942,51 @@ def user_detail(request, pk):
 
         if serialized_user.is_valid():
             # combine updated with the current user instance and serialize
-            serialized_user.update(instance=user, validated_data=serialized_user.validated_data)
-            response.data = {'msg': 'Account info updated successffully'}
+            serialized_user.update(
+                instance=user, validated_data=serialized_user.validated_data)
+            response.data = {'msg': ['Account info updated successffully']}
             response.status_code = status.HTTP_202_ACCEPTED
             return response
 
-        response.data = {'error':serialized_user.errors}
+        response.data = {'msg': serialized_user.errors}
         response.status_code = status.HTTP_400_BAD_REQUEST
         return response
 ```
 
 #### Logout
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 ```python
-@api_view(['GET'])
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@ensure_csrf_cookie
 def logout(request):
     '''Delete refresh token from the database
     and delete the refreshtoken cookie'''
     # Create response object
     response = Response()
 
+    # id of logged in user from request data
+    logged_in_user = request.data.get('user')
+
     # find the logged in user's refresh token
-    refresh_token = RefreshToken.objects.filter(user=request.user.id).first()
+    refresh_token = RefreshToken.objects.filter(
+        user=logged_in_user).first()
 
     if refresh_token is None:
-        response.data = {'msg':'Unauthorized'}
+        response.data = {'msg': ['Not logged in']}
         response.status_code = status.HTTP_400_BAD_REQUEST
         return response
 
     # if the token is found, delete it
     refresh_token.delete()
 
-    # remove the refreshtoken and csrftoken cookies
+    # delete the refresh cookie
     response.delete_cookie('refreshtoken')
-    response.delete_cookie('csrftoken')
 
     response.data = {
-        'msg': 'Logout successful. See you next time!'
+        'msg': ['Logout successful. See you next time!']
     }
 
     return response
@@ -1049,11 +994,11 @@ def logout(request):
 
 ## Conclusion
 
-[Top &#8593;](#table-of-contents)
+[Top &#8593;](#backend)
 
 That should do it for the backend. These views can now be tested using Python's requests module, Curl, or Postman. We could also write tests to ping each endpoint with valid and invalid tokens. Token expiration times can be shortened to test responses with expired tokens.
 
-### Final file structure
+### Final backend structure
 
 ```bash
 backend/
@@ -1079,7 +1024,7 @@ backend/
     │   utils.py
     │   views.py
     │   __init__.py
-    │   
+    │
     └───migrations
             0001_initial.py
             __init__.py
