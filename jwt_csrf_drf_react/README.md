@@ -10,43 +10,7 @@ JSON Web Token & CSRF Token Authentication between a Django REST Framework API a
   - [Environment Variables](#environment-variables)
     - [env](#env)
 - [Backend](#backend)
-  - [Backend Dependencies](#backend-dependencies)
-  - [Create Django Project](#create-django-project)
-    - [main/settings.py](#mainsettingspy)
-    - [main/urls.py](#mainurlspy)
-  - [Users App](#users-app)
-    - [Custom User Model](#custom-user-model)
-      - [users/models.py](#usersmodelspy)
-      - [users/admin.py](#usersadminpy)
-      - [Create Superuser](#create-superuser)
-    - [users/serializers.py](#usersserializerspy)
-    - [users/utils.py](#usersutilspy)
-    - [users/authentication.py](#usersauthenticationpy)
-    - [users/urls.py](#usersurlspy)
-    - [users/views.py](#usersviewspy)
-      - [Imports](#imports)
-      - [Register](#register)
-      - [Login](#login)
-      - [Auth](#auth)
-      - [Extend Token](#extend-token)
-      - [User Detail](#user-detail)
-      - [Logout](#logout)
-  - [Conclusion](#conclusion)
-    - [Final backend structure](#final-backend-structure)
 - [Frontend](#frontend)
-  - [Frontend Dependencies](#frontend-dependencies)
-  - [Utils](#utils)
-  - [Auth Context](#auth-context)
-    - [authContext.js](#authcontextjs)
-    - [context/types.js](#contexttypesjs)
-    - [context/AuthState.js](#contextauthstatejs)
-    - [context/authReducer.js](#contextauthreducerjs)
-  - [Auth Components](#auth-components)
-    - [Register.js](#registerjs)
-    - [Login.js](#loginjs)
-    - [components/UserDetail.js](#componentsuserdetailjs)
-
-<!-- /TOC -->
 
 ## Setup
 
@@ -122,3 +86,7 @@ jwt_def_react/
 ├───backend
 └───frontend
 ```
+
+# [Backend](backend.md)
+
+# [Frontend](frontend.md)
