@@ -113,16 +113,6 @@ MIDDLEWARE = [
 
 # add everything below to the bottom of settings.py
 
-# REST Framework Defaults
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'users.authentication.SafeJWTAuthentication' # custom authentication class
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ]
-}
-
 # Secret for encoding User refresh tokens
 REFRESH_TOKEN_SECRET = decouple.config('DJANGO_REFRESH_TOKEN_SECRET')
 

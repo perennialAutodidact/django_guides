@@ -416,9 +416,13 @@ const AuthState = props => {
     };
 
     try {
-      const response = await axios.post(BASE_URL + '/logout/', {
-        user: state.user.id,
-      });
+      const response = await axios.post(
+        BASE_URL + '/logout/',
+        {
+          user: state.user.id,
+        },
+        headers
+      );
 
       dispatch({
         type: LOGOUT,
