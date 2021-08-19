@@ -4,13 +4,10 @@ import decouple
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-t157e#2v%gy+x3c*-uu@6@ntci#b49g7f=@#8)o@)n#-$bw@jy'
-
-
 
 # Pull DEBUG boolean from .env
 # Add lines 16-19 to conditionally set
-DEBUG = decouple.config('DJANGO_DEBUB', cast=bool)
+DEBUG = decouple.config('DJANGO_DEBUG', cast=bool)
 
 # set SECRET_KEY based on DEBUG value
 if DEBUG:

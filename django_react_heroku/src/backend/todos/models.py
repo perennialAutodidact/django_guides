@@ -4,5 +4,5 @@ class Todo(models.Model):
     title=models.CharField(max_length=200)
     completed=models.BooleanField(default=False)
 
-def str(self):
-    return f"{self.id}. {self.title}\nCompleted:{self.completed}"
+    def __str__(self):
+        return f"{self.id}. {self.title}\nCompleted:{self.completed}"

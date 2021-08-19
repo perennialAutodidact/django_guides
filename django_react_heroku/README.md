@@ -3,6 +3,7 @@
 
 - [Deploy to Heroku with Django REST Framework and React](#deploy-to-heroku-with-django-rest-framework-and-react)
   - [Setup](#setup)
+  - [Setup Backend](#setup-backend)
     - [backend/.env](#backendenv)
     - [main/settings.py](#mainsettingspy)
     - [todos/models.py](#todosmodelspy)
@@ -10,6 +11,7 @@
     - [main/urls.py](#mainurlspy)
     - [todos/urls.py](#todosurlspy)
     - [todos/views.py](#todosviewspy)
+    - [Create Todo Objects](#create-todo-objects)
 
 A step-by-step guide for deploying a project with [Django](https://www.djangoproject.com/), [Django REST Framework](https://www.django-rest-framework.org/) (DRF) and [React](https://reactjs.org/) to [Heroku](https://www.heroku.com/) using the Git command line.
 
@@ -39,6 +41,8 @@ Next, we'll setup a Pipenv environment in the `backend` folder and install Djang
 /backend$ pipenv install django django-rest-framework django-cors-headers python-decouple
 ```
 
+## Setup Backend
+
 Next, we'll create our Django project.
 
 ```bash
@@ -61,6 +65,7 @@ Add the following sections to `main/settings.py`. Leave all other default settin
 
 ### main/settings.py
 ```python
+# main/settings.py
 import decouple
 
 # Pull DEBUG boolean from .env
@@ -108,20 +113,29 @@ Next we'll set up the `todos` app and populate a few Todo items into the databas
 
 Our `Todo` model will only have two fields: `title` and `completed`.
 ```python
+# todos/models.py
 from django.db import models
 
 class Todo(models.Model):
     title=models.CharField(max_length=200)
     completed=models.BooleanField(default=False)
 
-def str(self):
-    return f"{self.id}. {self.title}\nCompleted:{self.completed}"
+    def __str__(self):
+        return f"{self.id}. {self.title}\nCompleted:{self.completed}"
+```
+
+Make migrations and migrate.
+
+```
+/backend$  pipenv run python manage.py makemigrations 
+/backend$  pipenv run python manage.py migrate 
 ```
 
 ### todos/serializers.py
 Set up a `ModelSerializer` for the `Todo` model which will display all available fields.
 
 ```python
+# todos/serializers.py
 from rest_framework import serializers
 
 from .models import Todo
@@ -137,12 +151,13 @@ class TodoSerializer(serializers.ModelSerializer):
 Include `todos.views` in the project URLs.
 
 ```python
+# main/urls.py
 from django.contrib import admin
 from django.urls import path, include # import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('todos/', include('todos.views')) # add
+    path('todos/', include('todos.urls')) # add
 ]
 ```
 
@@ -150,7 +165,8 @@ urlpatterns = [
 
 Set up a URL which returns all the Todo items with a GET request and adds an item to the list with a POST request.
 
-```
+```python
+#todos/urls.py
 from django.urls import path
 
 from . import views
@@ -166,7 +182,122 @@ Create a decorated view function for our `todo_list` API endpoint.
 which returns all the Todo items with a GET request and adds an item to the list with a POST request.
 
 ```python
+# todos/views.py
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
 
+from .models import Todo
+from .serializers import TodoSerializer
 
+@api_view(['GET', 'POST'])
+def todo_list(request):
+    '''
+    GET  - Retrieve all Todos
+    POST - Create Todo
+    '''
+    # create empty DRF Response object
+    response = Response()
+
+    if request.method == 'GET':
+        todos = Todo.objects.all()
+
+        todo_serializer = TodoSerializer(todos, many=True)
+
+        response.data = {
+            todos: todo_serializer.data
+        }
+
+    elif request.method == 'POST':
+        form_data = request.data.get('formData')
+
+        new_todo_serializer = TodoSerializer(data=form_data)
+
+        if new_todo_serializer.is_valid():
+            new_todo = new_todo_serializer.save()
+
+            response.data = {
+                'todo': new_todo_serializer.validated_data,
+                'message': 'Item added to the list'
+            }
+
+        else:
+            response.status = status.HTTP_400_BAD_REQUEST
+            response.data = {
+                'message': new_todo_serializer.errors
+            }
+
+    return response
+
+@api_view(['GET', 'POST'])
+def todo_detail(request, todo_id):
+    '''
+    GET  - Retrieve single Todo
+    POST - Update Todo
+    '''
+    # create empty DRF Response object
+    response = Response()
+
+    todo = Todo.objects.get(id=todo_id)
+
+    if not todo:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.data = {
+                'message': 'Item not found'
+            }
+
+    # if the todo item was retrieved
+    else:
+        if request.method == 'GET':
+            todo_serializer = TodoSerializer(todo)
+
+            response.data = {
+                todo: todo_serializer.data
+            }
+
+        elif request.method == 'POST':
+            form_data = request.data.get('formData')
+
+            new_todo_serializer = TodoSerializer(todo, data=form_data, partial=True)
+
+            if new_todo_serializer.is_valid():
+                new_todo = new_todo_serializer.save()
+
+                response.data = {
+                    'todo': new_todo_serializer.validated_data,
+                    'message': 'Item added to the list'
+                }
+
+            else:
+                response.status = status.HTTP_400_BAD_REQUEST
+                response.data = {
+                    'message': new_todo_serializer.errors
+                }
+    
+    return response
+
+        
 
 ```
+
+### Create Todo Objects
+
+Let's open the Django shell and create a few Todo objects.
+
+```
+/backend$ pipenv run python manage.py shell
+
+>>> from todos.models import Todo
+>>> todos = dict([('Weed the garden', False), ('Flip the compost', False), ('Prune the grapes', False)])
+>>> for title, completed in todos.items():
+...    Todo.objects.create(title=title, completed=completed)
+
+1. Weed the garden
+Completed:False
+2. Flip the compost
+Completed:False
+3. Prune the grapes
+Completed:False
+```
+
+Excellent! 
