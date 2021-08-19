@@ -337,4 +337,10 @@ We can also install Axios for making HTTP requests.
 
 ### Todos.js
 
-Because we're keeping this app relatively simple, we'll handle all state using the `useState` hook within `Todos.js`.
+Because we're keeping this app relatively simple, we'll handle all state using the `useState` hook within `Todos.js`. We'll create a `components` folder to house the Todo components.
+
+```javascript
+// Todos.js
+
+
+```

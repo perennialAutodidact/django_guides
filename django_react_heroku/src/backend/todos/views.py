@@ -7,16 +7,21 @@ from .serializers import TodoSerializer
 
 @api_view(['GET', 'POST'])
 def todo_list(request):
+    '''
+    GET  - Retrieve all Todos
+    POST - Create Todo
+    '''
     # create empty DRF Response object
     response = Response()
 
     if request.method == 'GET':
         todos = Todo.objects.all()
 
+
         todo_serializer = TodoSerializer(todos, many=True)
 
         response.data = {
-            todos: todo_serializer.data
+            'todos': todo_serializer.data
         }
 
         return response
@@ -27,7 +32,7 @@ def todo_list(request):
         new_todo_serializer = TodoSerializer(data=form_data)
 
         if new_todo_serializer.is_valid():
-            new_todo = new_todo_serializer.save()
+            new_todo_serializer.save()
 
             response.data = {
                 'todo': new_todo_serializer.validated_data,
@@ -40,17 +45,19 @@ def todo_list(request):
                 'message': new_todo_serializer.errors
             }
 
+    return response
+
 
 @api_view(['GET', 'POST'])
 def todo_detail(request, todo_id):
     '''
-        GET  - Retrieve single Todo
-        POST - Update Todo
+    GET  - Retrieve single Todo
+    POST - Update Todo
     '''
     # create empty DRF Response object
     response = Response()
 
-    todo = Todo.objects.get(id=todo_id)
+    todo = Todo.objects.filter(id=todo_id).first()
 
     if not todo:
         response.status_code = status.HTTP_400_BAD_REQUEST
@@ -64,11 +71,11 @@ def todo_detail(request, todo_id):
             todo_serializer = TodoSerializer(todo)
 
             response.data = {
-                todo: todo_serializer.data
+                'todo': todo_serializer.data
             }
 
         elif request.method == 'POST':
-            form_data = request.data.get('formData')
+            form_data = request.data
 
             new_todo_serializer = TodoSerializer(todo, data=form_data, partial=True)
 
@@ -77,7 +84,7 @@ def todo_detail(request, todo_id):
 
                 response.data = {
                     'todo': new_todo_serializer.validated_data,
-                    'message': 'Item added to the list'
+                    'message': 'Item updated'
                 }
 
             else:
@@ -88,4 +95,29 @@ def todo_detail(request, todo_id):
     
     return response
 
-        
+
+
+@api_view(['POST'])
+def todo_delete(request, todo_id):
+    '''
+    POST - delete the todo with the given id
+    '''
+    response = Response()
+
+    todo = Todo.objects.filter(id=todo_id).first()
+
+    if todo:
+
+        todo.delete()
+
+        response.data = {
+            'message': 'Todo deleted'
+        }
+
+    else:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        response.data = {
+                'message': 'Item not found'
+            }
+
+    return response
