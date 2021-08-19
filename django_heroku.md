@@ -2,7 +2,9 @@
 
 A step-by-step guide for deploying a [Django](https://www.djangoproject.com/) project to [Heroku](https://www.heroku.com/) using the Git command line.
 
-This guide is written using a Linux terminal and will use Django 3.0 and Python 3.8.
+This guide was written using a Linux terminal and will use Django 3.0 and Python 3.8.
+
+Updated August, 2021 using Django 3.2 and Python 3.9. 
 
 ## Create Django Project
 
@@ -269,7 +271,8 @@ Add and commit all local changes in your repository.
 
 Push the changes to Heroku
 
-    $ pipenv run git push heroku master
+    $ pipenv run git push heroku main
+
 
 Once successfully pushed, we need to apply our database migrations:
 
