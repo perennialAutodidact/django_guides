@@ -12,6 +12,7 @@
     - [todos/urls.py](#todosurlspy)
     - [todos/views.py](#todosviewspy)
     - [Create Todo Objects](#create-todo-objects)
+  - [Setup Frontend](#setup-frontend)
 
 A step-by-step guide for deploying a project with [Django](https://www.djangoproject.com/), [Django REST Framework](https://www.django-rest-framework.org/) (DRF) and [React](https://reactjs.org/) to [Heroku](https://www.heroku.com/) using the Git command line.
 
@@ -178,8 +179,10 @@ urlpatterns = [
 
 ### todos/views.py
 
-Create a decorated view function for our `todo_list` API endpoint.
-which returns all the Todo items with a GET request and adds an item to the list with a POST request.
+Let's create CRUD endpoints for our Todo items.
+
+`/todo_list`: GET - retrieve all Todos, POST - create Todo
+`/todo_detail/:todo_id/`: GET - retrieve Todo by id, POST - update Todo
 
 ```python
 # todos/views.py
@@ -275,9 +278,6 @@ def todo_detail(request, todo_id):
                 }
     
     return response
-
-        
-
 ```
 
 ### Create Todo Objects
@@ -300,4 +300,28 @@ Completed:False
 Completed:False
 ```
 
-Excellent! 
+Excellent! Now we're ready to move on to the Frontend
+
+## Setup Frontend
+
+Let's navigate into the `frontend` folder and create a React app with `create-react-app`.
+
+```
+/frontend$ create-react-app .
+```
+
+Once the app is created, we'll clean up the file structure to look like this:
+
+```
+frontend/
+├── node_modules/
+├── src
+       ├── App.css
+       ├── App.js
+       ├── index.css
+       └── index.js
+├── public
+       └── index.html     
+├── package.json
+└── yarn.lock     
+```
