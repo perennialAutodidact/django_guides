@@ -13,6 +13,7 @@
     - [todos/views.py](#todosviewspy)
     - [Create Todo Objects](#create-todo-objects)
   - [Setup Frontend](#setup-frontend)
+    - [Todos.js](#todosjs)
 
 A step-by-step guide for deploying a project with [Django](https://www.djangoproject.com/), [Django REST Framework](https://www.django-rest-framework.org/) (DRF) and [React](https://reactjs.org/) to [Heroku](https://www.heroku.com/) using the Git command line.
 
@@ -325,3 +326,15 @@ frontend/
 ├── package.json
 └── yarn.lock     
 ```
+
+We'll also get rid of all boilerplate HTML and styles in `App.js` to start from scratch.
+
+We can also install Axios for making HTTP requests.
+
+```
+/frontend$ npm install --s axios
+```
+
+### Todos.js
+
+Because we're keeping this app relatively simple, we'll handle all state using the `useState` hook within `Todos.js`.
