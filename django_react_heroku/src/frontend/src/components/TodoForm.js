@@ -5,24 +5,22 @@ const TodoForm = ({ createTodo }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    createTodo({title:todoText, completed:false});
+    createTodo({ title: todoText, completed: false });
     setTodoText("");
   };
 
   const onChange = (e) => setTodoText(e.target.value);
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          onChange={onChange}
-          value={todoText}
-          placeholder="Add a new item"
-        />
-        <button>Submit</button>
-      </form>
-    </>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        onChange={onChange}
+        value={todoText}
+        placeholder="Add a new item"
+      />
+      <button>Submit</button>
+    </form>
   );
 };
 
